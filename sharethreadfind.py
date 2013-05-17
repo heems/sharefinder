@@ -7,7 +7,8 @@ from bs4 import BeautifulSoup
 import re
 
 data = json.load(urllib2.urlopen("http://api.4chan.org/mu/catalog.json"))
-w = open('whitelist.txt', 'r')
+w = open('tripfilter.txt', 'r')
+s = open('shares.txt', 'w')
 
 def soupify(raw):
 	raw = raw.replace("</br>", "\n")
@@ -31,8 +32,14 @@ def printShares(threadno):
 	for i in range(0, len(posts)):
 		if 'trip' not in posts[i] or fTrip(posts[i]['trip']) == False:
 			if 'com' in posts[i] and "youtube" in posts[i]['com']:
-				print soupify(posts[i]['com'])
-				print "-------------------------------------------------"
+				try:
+					s.write(soupify(posts[i]['com']))
+				except UnicodeEncodeError:
+					s.write(soupify(posts[i]['com']).encode('utf8'))
+				else:
+					s.write("\n")
+					s.write("-------------------------------------------------")
+					s.write("\n")
 
 for i in range(0,11):
 	for thread in data[i]["threads"]:
